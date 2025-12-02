@@ -16,6 +16,6 @@ val Pink40 = Color(0xFF7D5260)
  *  App Colors
  */
 
-val CardBackground = Color(0xFFE9EABE)
+val CardTitleBackground = Color(0xFFE9EABE)
 
-val Background = Color(0xFFFAFFF8)
+val CardBodyBackground = Color(0xFFFAFFF8)
