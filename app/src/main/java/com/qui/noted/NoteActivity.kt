@@ -1,6 +1,7 @@
 package com.qui.noted
 
 
+import android.content.ClipData
 import androidx.compose.ui.graphics.Color
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -18,6 +19,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -36,6 +38,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.qui.noted.ui.theme.CardBodyBackground
+import com.qui.noted.ui.theme.CardBorder
 import com.qui.noted.ui.theme.CardTitleBackground
 import com.qui.noted.ui.theme.NotedTheme
 import com.qui.noted.ui.theme.White
@@ -86,7 +89,7 @@ fun Note() {
                 .fillMaxWidth()
                 .wrapContentHeight(Alignment.CenterVertically),
             colors = CardDefaults.cardColors(containerColor = CardBodyBackground),
-            border = BorderStroke(2.dp, Color.Gray)
+            border = BorderStroke(2.dp, color = CardBorder)
         ) {
             Body()
         }
@@ -108,13 +111,18 @@ fun Title() {
 
 @Composable
 fun Body() {
-    Text(
-        modifier = Modifier
-            .padding(start = 10.dp, end = 10.dp)
-            .verticalScroll(rememberScrollState()),
-        text = "\n" + stringResource(R.string.note_sample),
-        fontSize = 20.sp,
-        fontWeight = FontWeight.W500,
-        fontFamily = loraFontFamily
-    )
+    LazyColumn {
+        item { Spacer(modifier = Modifier.height(5.dp)) }
+        item {
+            Text(
+                modifier = Modifier
+                    .padding(start = 10.dp, end = 10.dp),
+//                    .verticalScroll(rememberScrollState()),
+                text = stringResource(R.string.note_sample),
+                fontSize = 20.sp,
+                fontWeight = FontWeight.W500,
+                fontFamily = loraFontFamily
+            )
+        }
+    }
 }
