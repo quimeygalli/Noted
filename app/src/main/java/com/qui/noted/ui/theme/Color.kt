@@ -23,3 +23,5 @@ val CardBodyBackground = Color(0xFFFAFFF8)
 val CardBorder = Color(0xFFD3D3D3)
 
 val LightText = Color(0xFF505050)
+
+val TransparentColor = Color(0x00000000)

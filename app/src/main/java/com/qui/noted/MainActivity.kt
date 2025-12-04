@@ -1,12 +1,18 @@
 package com.qui.noted
 
-import com.qui.noted.ui.theme.LightText
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -16,14 +22,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.qui.noted.ui.theme.LightText
 import com.qui.noted.ui.theme.NotedTheme
 
 class MainActivity : ComponentActivity() {
@@ -36,12 +43,17 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-@Preview (showBackground = true)
+
+
+
+@Preview
 @Composable
 fun NoteGrid() {
     val itemsList = (0..100).toList()
 
     LazyVerticalGrid(
+        modifier = Modifier
+            .background(color = Color.White),
         columns = GridCells.Adaptive(minSize = 116.dp),
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -55,6 +67,12 @@ fun NoteGrid() {
 
 @Composable
 fun GridItem(item: Int) {
+
+    val colorStops = arrayOf(
+        0.01f to LightText,
+        0.13f to Color.Transparent,
+    )
+
     Card(
         modifier = Modifier
             .width(160.dp)
@@ -76,7 +94,12 @@ fun GridItem(item: Int) {
             Spacer(Modifier.height(5.dp))
             Text(
                 text = stringResource(R.string.note_sample),
-                color = LightText
+                color = LightText,
+                style = TextStyle(
+                    brush = Brush.verticalGradient(
+                        colorStops = colorStops
+                    )
+                )
             )
         }
     }
