@@ -42,6 +42,26 @@ android {
 }
 
 dependencies {
+
+    // Kotlin coroutines
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
+
+    // ViewModel
+    val lifecycle_version = "2.10.0"
+
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:${lifecycle_version}")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:${lifecycle_version}")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:${lifecycle_version}")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:${lifecycle_version}")
+
+    // Room
+    val room_version = "2.8.4"
+    implementation("androidx.room:room-runtime:${room_version}")
+
+    // Compose navigation
+    val nav_version = "2.9.6"
+    implementation("androidx.navigation:navigation-compose:${nav_version}")
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

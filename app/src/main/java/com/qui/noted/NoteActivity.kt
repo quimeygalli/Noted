@@ -35,8 +35,8 @@ import com.qui.noted.ui.theme.CardTitleBackground
 import com.qui.noted.ui.theme.NotedTheme
 import com.qui.noted.ui.theme.White
 
-val loraFontFamily = FontFamily(
-    Font(R.font.lora_font, FontWeight.Normal)
+val onestFontFamily = FontFamily(
+    Font(R.font.onest_font, FontWeight.Normal)
 )
 
 class NoteActivity : ComponentActivity() {
@@ -96,7 +96,7 @@ fun Title() {
         text = "Title Example",
         fontSize = 40.sp,
         fontWeight = FontWeight.Light,
-        fontFamily = loraFontFamily
+        fontFamily = onestFontFamily
     )
 }
 
@@ -107,12 +107,11 @@ fun Body() {
         item {
             Text(
                 modifier = Modifier
-                    .padding(start = 10.dp, end = 10.dp),
-//                    .verticalScroll(rememberScrollState()),
+                    .padding(start = 15.dp, end = 15.dp),
                 text = stringResource(R.string.note_sample),
                 fontSize = 20.sp,
                 fontWeight = FontWeight.W500,
-                fontFamily = loraFontFamily
+                fontFamily = onestFontFamily
             )
         }
     }
