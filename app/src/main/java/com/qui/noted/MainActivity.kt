@@ -98,11 +98,13 @@ fun NotedApp() {
                 notes = notes
             )
         }
+
+        // 'note/{id}' defines the route to get to the notes. Refer to 'GridItem->Card->modifier->.clickable' to see it in action.
         composable("note/{id}") { backStackEntry ->
             Note(
                 nav = nav,
                 notes = notes,
-                id = backStackEntry.arguments?.getString("id")!!.toInt()
+                id = backStackEntry.arguments?.getString("id")!!.toInt() // Arguments are always strings
             )
         }
     }
