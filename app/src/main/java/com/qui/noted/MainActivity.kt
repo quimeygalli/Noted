@@ -1,5 +1,6 @@
 package com.qui.noted
 
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -84,13 +85,7 @@ fun NotedApp() {
     val nav = rememberNavController()
 
     val notes = remember {
-        mutableStateListOf(
-        Note(id = 1, title = "Example note", body = "sample 1"),
-        Note(id = 2, title = "Sample note", body = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n" +
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n " +
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n " +
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")
-        )
+        mutableStateListOf<Note>()
     }
 
     NavHost(
@@ -115,9 +110,34 @@ fun NotedApp() {
 
 /**
 
+
+            Note creation
+
+ **/
+
+fun createNewNote(nav: NavController, notes: MutableList<Note>) {
+
+    // For a new note select the max id and add 1. If its the first note make it 0 and add 1
+    val newId = (notes.maxOfOrNull { it.id } ?: 0) + 1
+
+    val newNote: Note = Note(
+        id = newId,
+        title = "",
+        body = ""
+    )
+
+    notes.add(newNote)
+
+    nav.navigate("note/$newId")
+}
+
+/**
+
             Note selection menu
 
  **/
+
+//region
 
 @Composable
 fun NoteMenu(nav: NavController, notes: SnapshotStateList<Note>) {
@@ -128,7 +148,9 @@ fun NoteMenu(nav: NavController, notes: SnapshotStateList<Note>) {
                 modifier = Modifier
                 .size(60.dp),
             containerColor = FABColor,
-            onClick = {},
+            onClick = {
+                createNewNote(nav, notes)
+            },
             shape = RoundedCornerShape(18.dp)
             ) {
             Icon(
@@ -226,7 +248,7 @@ fun GridItem(nav: NavController, note: Note) {
                 )
                 Spacer(Modifier.height(5.dp))
                 Text(
-                    text = "${note.body}",
+                    text = "${note.body.take(200)}",
                     color = LightTextColor
                 )
             }
@@ -251,16 +273,19 @@ fun GridItem(nav: NavController, note: Note) {
 
 }
 
-
+//endregion
 
 /**
 
             Individual note blueprint
 
- **/
+**/
 
+//region
 @Composable
 fun Note(nav: NavController, notes: SnapshotStateList<Note>, id: Int) {
+    val note = notes.first {it.id == id} // note will be the first element to have a coinciding id
+
     Column(
         modifier = Modifier
             .background(color = White)
@@ -276,7 +301,12 @@ fun Note(nav: NavController, notes: SnapshotStateList<Note>, id: Int) {
                 containerColor = CardTitleBackgroundColor
             )
         ) {
-            Title()
+            Text(
+                modifier = Modifier.padding(10.dp),
+                text = note.title,
+                fontSize = 40.sp,
+                fontFamily = onestFontFamily
+            )
         }
 
         Spacer(modifier = Modifier.height(20.dp))
@@ -289,37 +319,18 @@ fun Note(nav: NavController, notes: SnapshotStateList<Note>, id: Int) {
             colors = CardDefaults.cardColors(containerColor = CardBodyBackgroundColor),
             border = BorderStroke(2.dp, color = CardBorderColor)
         ) {
-            Body()
-        }
-
-    }
-}
-
-@Composable
-fun Title() {
-    Text(
-        modifier = Modifier
-            .padding(10.dp),
-        text = "Title Example",
-        fontSize = 40.sp,
-        fontWeight = FontWeight.Light,
-        fontFamily = onestFontFamily
-    )
-}
-
-@Composable
-fun Body() {
-    LazyColumn {
-        item { Spacer(modifier = Modifier.height(5.dp)) }
-        item {
-            Text(
-                modifier = Modifier
-                    .padding(start = 15.dp, end = 15.dp),
-                text = stringResource(R.string.note_sample),
-                fontSize = 20.sp,
-                fontWeight = FontWeight.W500,
-                fontFamily = onestFontFamily
-            )
+            LazyColumn {
+                item {
+                    Text(
+                        modifier = Modifier.padding(start = 15.dp, end = 15.dp),
+                        text = note.body,
+                        fontSize = 20.sp,
+                        fontFamily = onestFontFamily
+                    )
+                }
+            }
         }
     }
 }
+
+//endregion
