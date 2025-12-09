@@ -5,6 +5,6 @@ package com.qui.noted
 
 data class Note(
     val id: Int,
-    val title: String,
-    val body: String,
+    var title: String,
+    var body: String,
 )

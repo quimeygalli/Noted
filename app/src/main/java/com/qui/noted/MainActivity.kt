@@ -34,6 +34,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -249,7 +250,8 @@ fun GridItem(nav: NavController, note: Note) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "${note.title}",
+                    text = "${note.title.take(20)}" +
+                    if (note.title.length > 20) "..." else "",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -317,8 +319,10 @@ fun Note(nav: NavController, notes: SnapshotStateList<Note>, id: Int) {
                 onValueChange = { title = it },
                 textStyle = LocalTextStyle.current.copy(
                     fontSize = 40.sp,
-                    fontFamily = onestFontFamily
+                    fontFamily = onestFontFamily,
+                    lineHeight = 35.sp
                 ),
+                singleLine = true,
             )
         }
 
@@ -329,8 +333,7 @@ fun Note(nav: NavController, notes: SnapshotStateList<Note>, id: Int) {
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight(Alignment.CenterVertically),
-            colors = CardDefaults.cardColors(containerColor = CardBodyBackgroundColor),
-            border = BorderStroke(2.dp, color = CardBorderColor)
+            colors = CardDefaults.cardColors(containerColor = CardBodyBackgroundColor)
         ) {
             LazyColumn {
                 item {
@@ -346,6 +349,10 @@ fun Note(nav: NavController, notes: SnapshotStateList<Note>, id: Int) {
                 }
             }
         }
+    }
+    LaunchedEffect(title, body) {
+        note.title = title
+        note.body = body
     }
 }
 
