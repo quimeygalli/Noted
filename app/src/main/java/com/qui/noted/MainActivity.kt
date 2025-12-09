@@ -1,6 +1,5 @@
 package com.qui.noted
 
-import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -30,18 +29,22 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -104,7 +107,8 @@ fun NotedApp() {
             Note(
                 nav = nav,
                 notes = notes,
-                id = backStackEntry.arguments?.getString("id")!!.toInt() // Arguments are always strings
+                id = backStackEntry.arguments?.getString("id")!!
+                    .toInt() // Arguments are always strings
             )
         }
     }
@@ -113,7 +117,7 @@ fun NotedApp() {
 /**
 
 
-            Note creation
+Note creation
 
  **/
 
@@ -135,7 +139,7 @@ fun createNewNote(nav: NavController, notes: MutableList<Note>) {
 
 /**
 
-            Note selection menu
+Note selection menu
 
  **/
 
@@ -148,25 +152,27 @@ fun NoteMenu(nav: NavController, notes: SnapshotStateList<Note>) {
         floatingActionButton = {
             FloatingActionButton(
                 modifier = Modifier
-                .size(60.dp),
-            containerColor = FABColor,
-            onClick = {
-                createNewNote(nav, notes)
-            },
-            shape = RoundedCornerShape(18.dp)
+                    .size(60.dp),
+                containerColor = FABColor,
+                onClick = {
+                    createNewNote(nav, notes)
+                },
+                shape = RoundedCornerShape(18.dp)
             ) {
-            Icon(
-                painter = painterResource(
-                    R.drawable.ic_add_note
-                ),
-                contentDescription = "Add note",
-                modifier = Modifier)
+                Icon(
+                    painter = painterResource(
+                        R.drawable.ic_add_note
+                    ),
+                    contentDescription = "Add note",
+                    modifier = Modifier
+                )
             }
         }
-    ) {
+    ) { it: PaddingValues ->
         Column(
             modifier = Modifier
                 .background(Color.White)
+                .padding(paddingValues = PaddingValues(0.dp))
         ) {
             Row(
                 modifier = Modifier
@@ -231,8 +237,7 @@ fun GridItem(nav: NavController, note: Note) {
         modifier = Modifier
             .width(160.dp)
             .height(200.dp)
-            .clickable { nav.navigate("note/${note.id}") }
-        ,
+            .clickable { nav.navigate("note/${note.id}") },
         shape = RoundedCornerShape(18.dp)
     ) {
         Box {
@@ -279,14 +284,17 @@ fun GridItem(nav: NavController, note: Note) {
 
 /**
 
-            Individual note blueprint
+Individual note blueprint
 
-**/
+ **/
 
 //region
 @Composable
 fun Note(nav: NavController, notes: SnapshotStateList<Note>, id: Int) {
-    val note = notes.first {it.id == id} // note will be the first element to have a coinciding id
+    val note = notes.first { it.id == id } // note will be the first element to have a coinciding id
+
+    var title by remember { mutableStateOf(note.title) }
+    var body by remember { mutableStateOf(note.body) }
 
     Column(
         modifier = Modifier
@@ -303,11 +311,14 @@ fun Note(nav: NavController, notes: SnapshotStateList<Note>, id: Int) {
                 containerColor = CardTitleBackgroundColor
             )
         ) {
-            Text(
+            TextField(
                 modifier = Modifier.padding(10.dp),
-                text = note.title,
-                fontSize = 40.sp,
-                fontFamily = onestFontFamily
+                value = title,
+                onValueChange = { title = it },
+                textStyle = LocalTextStyle.current.copy(
+                    fontSize = 40.sp,
+                    fontFamily = onestFontFamily
+                ),
             )
         }
 
@@ -323,11 +334,14 @@ fun Note(nav: NavController, notes: SnapshotStateList<Note>, id: Int) {
         ) {
             LazyColumn {
                 item {
-                    Text(
+                    TextField(
                         modifier = Modifier.padding(start = 15.dp, end = 15.dp),
-                        text = note.body,
-                        fontSize = 20.sp,
-                        fontFamily = onestFontFamily
+                        value = body,
+                        onValueChange = { body = it },
+                        textStyle = LocalTextStyle.current.copy(
+                            fontSize = 20.sp,
+                            fontFamily = onestFontFamily
+                        ),
                     )
                 }
             }
