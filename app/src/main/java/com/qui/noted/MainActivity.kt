@@ -33,6 +33,7 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -51,6 +52,8 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -63,7 +66,10 @@ import com.qui.noted.ui.theme.CardTitleBackgroundColor
 import com.qui.noted.ui.theme.FABColor
 import com.qui.noted.ui.theme.LightTextColor
 import com.qui.noted.ui.theme.NotedTheme
+import com.qui.noted.ui.theme.PreviewParameterSamples.NoteData
+import com.qui.noted.ui.theme.PreviewParameterSamples.SampleNoteDataProvider
 import com.qui.noted.ui.theme.White
+import kotlin.reflect.KClass
 
 /* Font Family */
 
@@ -83,7 +89,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Preview
+//@Preview
 @Composable
 fun NotedApp() {
     val nav = rememberNavController()
@@ -105,7 +111,7 @@ fun NotedApp() {
 
         // 'note/{id}' defines the route to get to the notes. Refer to 'GridItem->Card->modifier->.clickable' to see it in action.
         composable("note/{id}") { backStackEntry ->
-            Note(
+            IndividualNote(
                 nav = nav,
                 notes = notes,
                 id = backStackEntry.arguments?.getString("id")!!
@@ -169,11 +175,11 @@ fun NoteMenu(nav: NavController, notes: SnapshotStateList<Note>) {
                 )
             }
         }
-    ) { it: PaddingValues ->
+    ) { PaddingValues ->
         Column(
             modifier = Modifier
                 .background(Color.White)
-                .padding(paddingValues = PaddingValues(0.dp))
+                .padding(PaddingValues)
         ) {
             Row(
                 modifier = Modifier
@@ -292,7 +298,7 @@ Individual note blueprint
 
 //region
 @Composable
-fun Note(nav: NavController, notes: SnapshotStateList<Note>, id: Int) {
+fun IndividualNote(nav: NavController, notes: SnapshotStateList<Note>, id: Int) {
     val note = notes.first { it.id == id } // note will be the first element to have a coinciding id
 
     var title by remember { mutableStateOf(note.title) }
@@ -314,8 +320,15 @@ fun Note(nav: NavController, notes: SnapshotStateList<Note>, id: Int) {
             )
         ) {
             TextField(
-                modifier = Modifier.padding(10.dp),
+                modifier = Modifier
+                    .padding(10.dp),
                 value = title,
+                placeholder = { Text(
+                    text = "Title",
+                    fontSize = 40.sp,
+                    fontFamily = onestFontFamily,
+                    lineHeight = 35.sp
+                ) },
                 onValueChange = { title = it },
                 textStyle = LocalTextStyle.current.copy(
                     fontSize = 40.sp,
@@ -323,6 +336,15 @@ fun Note(nav: NavController, notes: SnapshotStateList<Note>, id: Int) {
                     lineHeight = 35.sp
                 ),
                 singleLine = true,
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent,
+                    errorContainerColor = Color.Transparent,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    disabledIndicatorColor = Color.Transparent,
+                    )
             )
         }
 
@@ -340,11 +362,25 @@ fun Note(nav: NavController, notes: SnapshotStateList<Note>, id: Int) {
                     TextField(
                         modifier = Modifier.padding(start = 15.dp, end = 15.dp),
                         value = body,
+                        placeholder = { Text(
+                            text = "What were your plans today?",
+                            fontSize = 20.sp,
+                            fontFamily = onestFontFamily
+                        )},
                         onValueChange = { body = it },
                         textStyle = LocalTextStyle.current.copy(
                             fontSize = 20.sp,
                             fontFamily = onestFontFamily
                         ),
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
+                            disabledContainerColor = Color.Transparent,
+                            errorContainerColor = Color.Transparent,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
+                            disabledIndicatorColor = Color.Transparent,
+                        )
                     )
                 }
             }
@@ -357,3 +393,28 @@ fun Note(nav: NavController, notes: SnapshotStateList<Note>, id: Int) {
 }
 
 //endregion
+
+@Preview
+@Composable
+fun NotePreview(@PreviewParameter(SampleNoteDataProvider::class) noteData: NoteData) {
+    // 1. Create a dummy NavController
+    val navController = rememberNavController()
+
+    // 2. Create a mock Note object using the data from your PreviewParameter
+    // (Assuming NoteData contains title and body strings)
+    val mockNote = Note(
+        id = 1,
+        title = noteData.title, // or hardcode "Sample Title"
+        body = noteData.body    // or hardcode "Sample Body"
+    )
+
+    // 3. Create the list expected by the composable
+    val mockNotesList = remember { mutableStateListOf(mockNote) }
+
+    // 4. Call the composable
+    IndividualNote(
+        nav = navController,
+        notes = mockNotesList,
+        id = 1 // This must match the ID of mockNote defined above
+    )
+}
