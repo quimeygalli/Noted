@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -54,23 +53,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.qui.noted.ui.theme.CardBodyBackgroundColor
-import com.qui.noted.ui.theme.CardBorderColor
-import com.qui.noted.ui.theme.CardTitleBackgroundColor
-import com.qui.noted.ui.theme.FABColor
-import com.qui.noted.ui.theme.LightTextColor
-import com.qui.noted.ui.theme.NotedTheme
+import com.qui.noted.ui.theme.ui.theme.CardBodyBackgroundColor
+import com.qui.noted.ui.theme.ui.theme.CardTitleBackgroundColor
+import com.qui.noted.ui.theme.ui.theme.FABColor
+import com.qui.noted.ui.theme.ui.theme.LightTextColor
+import com.qui.noted.ui.theme.ui.theme.NotedTheme
 import com.qui.noted.ui.theme.PreviewParameterSamples.NoteData
 import com.qui.noted.ui.theme.PreviewParameterSamples.SampleNoteDataProvider
-import com.qui.noted.ui.theme.White
-import kotlin.reflect.KClass
+import com.qui.noted.ui.theme.ui.theme.White
 
 /* Font Family */
 
@@ -90,7 +86,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-//@Preview
+@Preview
 @Composable
 fun NotedApp() {
     val nav = rememberNavController()
