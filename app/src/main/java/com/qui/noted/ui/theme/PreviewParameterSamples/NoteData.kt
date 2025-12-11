@@ -14,7 +14,7 @@ class SampleNoteDataProvider : PreviewParameterProvider<NoteData> {
         NoteData(
             -1,
             "This is a sample title",
-            "Lorem ipsum dolor amet blah blah blah this is the note body and it is long because its a note so it wont be as short as the titke"
+            "Lorem ipsum dolor sit amet blah blah blah this is the note body and it is long because its a note so it wont be as short as the titke"
         )
     )
 }

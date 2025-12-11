@@ -44,6 +44,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -217,11 +218,10 @@ fun GreetingBar() {
 
 @Composable
 fun NoteGrid(nav: NavController, notes: List<Note>) {
-
     LazyVerticalGrid(
         modifier = Modifier
             .background(color = Color.White),
-        columns = GridCells.Adaptive(minSize = 116.dp),
+        columns = GridCells.Adaptive(minSize = 220.dp), // How big the GridCells will be
         contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -241,13 +241,16 @@ fun GridItem(nav: NavController, note: Note) {
     )
 
     Card(
+        shape = RoundedCornerShape(18.dp),
         modifier = Modifier
             .width(160.dp)
             .height(200.dp)
-            .clickable { nav.navigate("note/${note.id}") },
-        shape = RoundedCornerShape(18.dp)
+            .clickable { nav.navigate("note/${note.id}") }
     ) {
-        Box {
+        Box(
+            modifier = Modifier
+                .clip(RoundedCornerShape(18.dp))
+        ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -256,14 +259,14 @@ fun GridItem(nav: NavController, note: Note) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "${note.title.take(20)}" +
-                    if (note.title.length > 20) "..." else "",
+                    text = note.title.take(20) +
+                    if (note.title.length > 40) "..." else "",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold
                 )
                 Spacer(Modifier.height(5.dp))
                 Text(
-                    text = "${note.body.take(200)}",
+                    text = note.body.take(200),
                     color = LightTextColor
                 )
             }
@@ -274,6 +277,7 @@ fun GridItem(nav: NavController, note: Note) {
             // This box will be drawn last, so it will be on top
             Box(
                 modifier = Modifier
+                    .clip(RoundedCornerShape(18.dp))
                     .matchParentSize()
                     .background(
                         Brush.verticalGradient(
@@ -394,27 +398,26 @@ fun IndividualNote(nav: NavController, notes: SnapshotStateList<Note>, id: Int) 
 
 //endregion
 
-@Preview
+//@Preview
 @Composable
 fun NotePreview(@PreviewParameter(SampleNoteDataProvider::class) noteData: NoteData) {
-    // 1. Create a dummy NavController
+    // Create a dummy NavController
     val navController = rememberNavController()
 
-    // 2. Create a mock Note object using the data from your PreviewParameter
-    // (Assuming NoteData contains title and body strings)
+    // Create a mock Note object using the data from your PreviewParameter (Assuming NoteData contains title and body strings)
     val mockNote = Note(
-        id = 1,
-        title = noteData.title, // or hardcode "Sample Title"
-        body = noteData.body    // or hardcode "Sample Body"
+        id = noteData.id,
+        title = noteData.title,
+        body = noteData.body
     )
 
-    // 3. Create the list expected by the composable
+    // Create the list expected by the composable
     val mockNotesList = remember { mutableStateListOf(mockNote) }
 
-    // 4. Call the composable
+    // Call the composable
     IndividualNote(
         nav = navController,
         notes = mockNotesList,
-        id = 1 // This must match the ID of mockNote defined above
+        id = 1
     )
 }
