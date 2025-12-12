@@ -1,7 +1,6 @@
 package com.qui.noted.ui.theme.PreviewParameterSamples
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import com.qui.noted.Note
 
 data class  NoteData (
     val id: Int = -1,
