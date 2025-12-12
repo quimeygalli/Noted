@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -55,8 +56,9 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:${lifecycle_version}")
 
     // Room
-    val room_version = "2.8.4"
-    implementation("androidx.room:room-runtime:${room_version}")
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
 
     // Compose navigation
     val nav_version = "2.9.6"

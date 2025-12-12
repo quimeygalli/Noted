@@ -2,12 +2,17 @@ package com.qui.noted.Room
 
 import androidx.room.*
 
+
+// Please never make me implement room again, dont touch this sht ever again.
+
 @Dao
 interface NoteDao {
 
     @Query("SELECT * FROM notes ORDER BY id DESC")
     suspend fun getAll(): List<NoteEntity>
 
+    // upsert combines insert and update.
+    // if an entry doesn't exist, it creates it. if it does, it updates it.
     @Upsert
     suspend fun upsert(note: NoteEntity)
 

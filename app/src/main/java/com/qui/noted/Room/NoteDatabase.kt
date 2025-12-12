@@ -1,14 +1,36 @@
 package com.qui.noted.Room
 
+import android.content.Context
 import androidx.room.Database
+import androidx.room.Room
 import androidx.room.RoomDatabase
+
+/** NEVER TOUCH THIS AGAIN **/
 
 @Database(
     entities = [NoteEntity::class],
-    version = 1
+    version = 1,
+    exportSchema = false
 )
-
-abstract class NoteDatabase: RoomDatabase() {
+abstract class NoteDatabase : RoomDatabase() {
 
     abstract fun dao(): NoteDao
+
+    companion object {
+
+        @Volatile
+        private var INSTANCE: NoteDatabase? = null
+
+        fun getDatabase(context: Context): NoteDatabase {
+            return INSTANCE ?: synchronized(this) {
+                val instance = Room.databaseBuilder(
+                    context.applicationContext,
+                    NoteDatabase::class.java,
+                    "notes_db"
+                ).build()
+                INSTANCE = instance
+                instance
+            }
+        }
+    }
 }

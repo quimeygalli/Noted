@@ -24,6 +24,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
@@ -35,12 +36,11 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -55,10 +55,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.qui.noted.Room.NoteDatabase
+import com.qui.noted.Room.NoteEntity
+import com.qui.noted.Room.NoteRepository
+import com.qui.noted.Room.NoteVMFactory
 import com.qui.noted.ui.theme.ui.theme.CardBodyBackgroundColor
 import com.qui.noted.ui.theme.ui.theme.CardTitleBackgroundColor
 import com.qui.noted.ui.theme.ui.theme.FABColor
@@ -77,43 +83,38 @@ val onestFontFamily = FontFamily(
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         enableEdgeToEdge()
+        val db = NoteDatabase.getDatabase(applicationContext)
+        val repo = NoteRepository(db.dao())
+        val factory = NoteVMFactory(repo)
+
         setContent {
             NotedTheme {
-                NotedApp()
+                val vm: NoteVM = viewModel(factory = factory)
+                NotedApp(vm)
             }
         }
     }
 }
 
-@Preview
-@Composable
-fun NotedApp() {
-    val nav = rememberNavController()
 
-    val notes = remember {
-        mutableStateListOf<Note>()
-    }
+@Composable
+fun NotedApp(vm: NoteVM) {
+    val nav = rememberNavController()
+    val notes by vm.notes.collectAsState() // List<NoteEntity>
 
     NavHost(
         navController = nav,
         startDestination = "menu"
     ) {
         composable("menu") {
-            NoteMenu(
-                nav = nav,
-                notes = notes
-            )
+            NoteMenu(nav = nav, vm = vm)
         }
 
-        // 'note/{id}' defines the route to get to the notes. Refer to 'GridItem->Card->modifier->.clickable' to see it in action.
         composable("note/{id}") { backStackEntry ->
-            IndividualNote(
-                nav = nav,
-                notes = notes,
-                id = backStackEntry.arguments?.getString("id")!!
-                    .toInt() // Arguments are always strings
-            )
+            val id = backStackEntry.arguments?.getString("id")!!.toInt()
+            IndividualNote(nav = nav, vm = vm, id = id)
         }
     }
 }
@@ -121,62 +122,37 @@ fun NotedApp() {
 /**
 
 
-Note creation
+            Note selection menu
 
- **/
-
-fun createNewNote(nav: NavController, notes: MutableList<Note>) {
-
-    // For a new note select the max id and add 1. If its the first note make it 0 and add 1
-    val newId = (notes.maxOfOrNull { it.id } ?: 0) + 1
-
-    val newNote: Note = Note(
-        id = newId,
-        title = "",
-        body = ""
-    )
-
-    notes.add(newNote)
-
-    nav.navigate("note/$newId")
-}
-
-/**
-
-Note selection menu
 
  **/
 
 //region
 
 @Composable
-fun NoteMenu(nav: NavController, notes: SnapshotStateList<Note>) {
+fun NoteMenu(nav: NavController, vm: NoteVM) {
+    val notes by vm.notes.collectAsState()
+
     Scaffold(
         modifier = Modifier,
         floatingActionButton = {
             FloatingActionButton(
-                modifier = Modifier
-                    .size(60.dp),
+                modifier = Modifier.size(60.dp),
                 containerColor = FABColor,
-                onClick = {
-                    createNewNote(nav, notes)
-                },
+                onClick = { nav.navigate("note/0") }, // navigate to "new note" screen
                 shape = RoundedCornerShape(18.dp)
             ) {
                 Icon(
-                    painter = painterResource(
-                        R.drawable.ic_add_note
-                    ),
-                    contentDescription = "Add note",
-                    modifier = Modifier
+                    painter = painterResource(R.drawable.ic_add_note),
+                    contentDescription = "Add note"
                 )
             }
         }
-    ) { PaddingValues ->
+    ) { paddingValues ->
         Column(
             modifier = Modifier
                 .background(Color.White)
-                .padding(PaddingValues)
+                .padding(paddingValues)
         ) {
             Row(
                 modifier = Modifier
@@ -188,14 +164,8 @@ fun NoteMenu(nav: NavController, notes: SnapshotStateList<Note>) {
             ) {
                 GreetingBar()
             }
-            Row(
-                modifier = Modifier
-                    .weight(75f)
-            ) {
-                NoteGrid(
-                    nav = nav,
-                    notes = notes
-                )
+            Row(modifier = Modifier.weight(75f)) {
+                NoteGrid(nav = nav, notes = notes)
             }
         }
     }
@@ -204,7 +174,7 @@ fun NoteMenu(nav: NavController, notes: SnapshotStateList<Note>) {
 @Composable
 fun GreetingBar() {
     Text(
-        text = "What's it gonna be this time, Quimey?",
+        text = "Welcome back",
         fontSize = 32.sp,
         textAlign = TextAlign.Center,
         fontFamily = onestFontFamily,
@@ -213,40 +183,37 @@ fun GreetingBar() {
 }
 
 @Composable
-fun NoteGrid(nav: NavController, notes: List<Note>) {
+fun NoteGrid(nav: NavController, notes: List<NoteEntity>) {
     LazyVerticalGrid(
-        modifier = Modifier
-            .background(color = Color.White),
-        columns = GridCells.Adaptive(minSize = 220.dp), // How big the GridCells will be
+        modifier = Modifier.background(color = Color.White),
+        columns = GridCells.Fixed(2),
         contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         items(notes) { note ->
-            GridItem(note = note, nav = nav)
+            GridItem(nav = nav, note = note)
         }
     }
 }
 
 @Composable
-fun GridItem(nav: NavController, note: Note) {
-
-    val colors = listOf(
-        Color.Transparent,
-        Color.LightGray
-    )
+fun GridItem(nav: NavController, note: NoteEntity) {
+    val colors = listOf(Color.Transparent, Color.LightGray)
 
     Card(
         shape = RoundedCornerShape(18.dp),
         modifier = Modifier
             .width(160.dp)
             .height(200.dp)
-            .clickable { nav.navigate("note/${note.id}") }
+            .clip(RoundedCornerShape(18.dp))
+            .clickable {
+                // safe navigate only if id exists
+                val id = note.id ?: return@clickable
+                nav.navigate("note/$id")
+            }
     ) {
-        Box(
-            modifier = Modifier
-                .clip(RoundedCornerShape(18.dp))
-        ) {
+        Box(modifier = Modifier.clip(RoundedCornerShape(18.dp))) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -255,22 +222,18 @@ fun GridItem(nav: NavController, note: Note) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = note.title.take(20) +
-                    if (note.title.length > 40) "..." else "",
+                    text = (note.title ?: "").take(40),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold
                 )
                 Spacer(Modifier.height(5.dp))
                 Text(
-                    text = note.body.take(200),
+                    text = (note.body ?: "").take(200),
                     color = LightTextColor
                 )
             }
 
-            // Gradient
-
-            // The gradient box is on the bottom because compose is just kotlin, so it's declarative
-            // This box will be drawn last, so it will be on top
+            // Gradient overlay
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(18.dp))
@@ -285,24 +248,145 @@ fun GridItem(nav: NavController, note: Note) {
             )
         }
     }
-
 }
 
 //endregion
 
 /**
 
-Individual note blueprint
+
+            Individual note screen
+
 
  **/
 
+
+
+
 //region
 @Composable
-fun IndividualNote(nav: NavController, notes: SnapshotStateList<Note>, id: Int) {
-    val note = notes.first { it.id == id } // note will be the first element to have a coinciding id
+fun IndividualNote(nav: NavController, vm: NoteVM, id: Int) {
+    val notes by vm.notes.collectAsState()
+    if (id == 0) {
+        var title by remember { mutableStateOf("") }
+        var body by remember { mutableStateOf("") }
 
-    var title by remember { mutableStateOf(note.title) }
-    var body by remember { mutableStateOf(note.body) }
+        Scaffold(
+            modifier = Modifier,
+            floatingActionButton = {
+                FloatingActionButton(
+                    modifier = Modifier.size(60.dp),
+                    containerColor = FABColor,
+                    onClick = {
+                        val toSave = NoteEntity(
+                            id = null,
+                            title = title,
+                            body = body
+                        )
+                        vm.saveNote(toSave)
+                        nav.popBackStack()
+                    },
+                    shape = RoundedCornerShape(18.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_check),
+                        contentDescription = "Save note"
+                    )
+                }
+            }
+        ){
+            Column(
+                modifier = Modifier
+                    .background(color = White)
+                    .fillMaxSize()
+                    .padding(20.dp)
+            ) {
+                // Title
+                Card(
+                    shape = RoundedCornerShape(18.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = CardTitleBackgroundColor)
+                ) {
+                    TextField(
+                        modifier = Modifier.padding(10.dp),
+                        value = title,
+                        onValueChange = { title = it },
+                        placeholder = {
+                            Text(
+                                text = "Title",
+                                fontSize = 32.sp,
+                                fontFamily = onestFontFamily
+                            )
+                        },
+                        textStyle = LocalTextStyle.current.copy(
+                            fontSize = 32.sp,
+                            fontFamily = onestFontFamily
+                        ),
+                        singleLine = true,
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
+                            disabledContainerColor = Color.Transparent,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent
+                        )
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                // Body
+                Card(
+                    shape = RoundedCornerShape(18.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = CardBodyBackgroundColor)
+                ) {
+                    LazyColumn {
+                        item {
+                            TextField(
+                                modifier = Modifier.padding(start = 15.dp, end = 15.dp),
+                                value = body,
+                                onValueChange = { body = it },
+                                placeholder = {
+                                    Text(
+                                        text = "What were your plans today?",
+                                        fontSize = 20.sp,
+                                        fontFamily = onestFontFamily
+                                    )
+                                },
+                                textStyle = LocalTextStyle.current.copy(
+                                    fontSize = 20.sp,
+                                    fontFamily = onestFontFamily
+                                ),
+                                colors = TextFieldDefaults.colors(
+                                    focusedContainerColor = Color.Transparent,
+                                    unfocusedContainerColor = Color.Transparent,
+                                    disabledContainerColor = Color.Transparent,
+                                    focusedIndicatorColor = Color.Transparent,
+                                    unfocusedIndicatorColor = Color.Transparent
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        return
+    }
+
+    // If note exists, load it by its id
+    val note = notes.firstOrNull { it.id == id }
+    if (note == null) {
+        // show not found
+        Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+            Text("Note not found")
+        }
+        return
+    }
+
+    var title by remember { mutableStateOf(note.title ?: "") }
+    var body by remember { mutableStateOf(note.body ?: "") }
 
     Column(
         modifier = Modifier
@@ -312,39 +396,23 @@ fun IndividualNote(nav: NavController, notes: SnapshotStateList<Note>, id: Int) 
     ) {
         Card(
             shape = RoundedCornerShape(18.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight(Alignment.CenterVertically),
-            colors = CardDefaults.cardColors(
-                containerColor = CardTitleBackgroundColor
-            )
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = CardTitleBackgroundColor)
         ) {
             TextField(
-                modifier = Modifier
-                    .padding(10.dp),
+                modifier = Modifier.padding(10.dp),
                 value = title,
-                placeholder = { Text(
-                    text = "Title",
-                    fontSize = 40.sp,
-                    fontFamily = onestFontFamily,
-                    lineHeight = 35.sp
-                ) },
                 onValueChange = { title = it },
-                textStyle = LocalTextStyle.current.copy(
-                    fontSize = 40.sp,
-                    fontFamily = onestFontFamily,
-                    lineHeight = 35.sp
-                ),
+                placeholder = { Text(text = "Title", fontSize = 32.sp, fontFamily = onestFontFamily) },
+                textStyle = LocalTextStyle.current.copy(fontSize = 32.sp, fontFamily = onestFontFamily),
                 singleLine = true,
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color.Transparent,
                     unfocusedContainerColor = Color.Transparent,
                     disabledContainerColor = Color.Transparent,
-                    errorContainerColor = Color.Transparent,
                     focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    disabledIndicatorColor = Color.Transparent,
-                    )
+                    unfocusedIndicatorColor = Color.Transparent
+                )
             )
         }
 
@@ -352,9 +420,7 @@ fun IndividualNote(nav: NavController, notes: SnapshotStateList<Note>, id: Int) 
 
         Card(
             shape = RoundedCornerShape(18.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight(Alignment.CenterVertically),
+            modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(containerColor = CardBodyBackgroundColor)
         ) {
             LazyColumn {
@@ -362,58 +428,34 @@ fun IndividualNote(nav: NavController, notes: SnapshotStateList<Note>, id: Int) 
                     TextField(
                         modifier = Modifier.padding(start = 15.dp, end = 15.dp),
                         value = body,
-                        placeholder = { Text(
-                            text = "What were your plans today?",
-                            fontSize = 20.sp,
-                            fontFamily = onestFontFamily
-                        )},
                         onValueChange = { body = it },
-                        textStyle = LocalTextStyle.current.copy(
-                            fontSize = 20.sp,
-                            fontFamily = onestFontFamily
-                        ),
+                        placeholder = { Text(text = "What were your plans today?", fontSize = 20.sp, fontFamily = onestFontFamily) },
+                        textStyle = LocalTextStyle.current.copy(fontSize = 20.sp, fontFamily = onestFontFamily),
                         colors = TextFieldDefaults.colors(
                             focusedContainerColor = Color.Transparent,
                             unfocusedContainerColor = Color.Transparent,
                             disabledContainerColor = Color.Transparent,
-                            errorContainerColor = Color.Transparent,
                             focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent,
-                            disabledIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent
                         )
                     )
                 }
             }
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(onClick = {
+            val updated = note.copy(title = title, body = body)
+            vm.saveNote(updated)
+            nav.popBackStack()
+        }) {
+            Text("Save")
+        }
     }
+
+    // keep UI updated
     LaunchedEffect(title, body) {
-        note.title = title
-        note.body = body
     }
 }
-
 //endregion
-
-//@Preview
-@Composable
-fun NotePreview(@PreviewParameter(SampleNoteDataProvider::class) noteData: NoteData) {
-    // Create a dummy NavController
-    val navController = rememberNavController()
-
-    // Create a mock Note object using the data from your PreviewParameter (Assuming NoteData contains title and body strings)
-    val mockNote = Note(
-        id = noteData.id,
-        title = noteData.title,
-        body = noteData.body
-    )
-
-    // Create the list expected by the composable
-    val mockNotesList = remember { mutableStateListOf(mockNote) }
-
-    // Call the composable
-    IndividualNote(
-        nav = navController,
-        notes = mockNotesList,
-        id = 1
-    )
-}
