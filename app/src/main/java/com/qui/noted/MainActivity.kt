@@ -3,6 +3,7 @@ package com.qui.noted
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
@@ -72,7 +73,7 @@ val onestFontFamily = FontFamily(
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        enableEdgeToEdge()
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false)
 
         val db = NoteDatabase.getDatabase(applicationContext)
@@ -302,7 +303,7 @@ fun IndividualNote(nav: NavController, vm: NoteVM, id: Int) {
                 modifier = Modifier
                     .background(MaterialTheme.colorScheme.background)
                     .fillMaxSize()
-                    .padding(20.dp)
+                    .padding(start = 20.dp, end = 20.dp, top = 40.dp, bottom = 20.dp)
             ) {
                 // Title
                 Card(
@@ -383,7 +384,9 @@ fun IndividualNote(nav: NavController, vm: NoteVM, id: Int) {
     if (note == null) {
         // show not found
         Column(
-            Modifier.fillMaxSize(),
+            Modifier
+                .fillMaxSize()
+                .padding(start = 20.dp, end = 20.dp, top = 40.dp, bottom = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
