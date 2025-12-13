@@ -1,5 +1,6 @@
 package com.qui.noted
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -92,7 +93,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun NotedApp(vm: NoteVM) {
     val nav = rememberNavController()
-    val notes by vm.notes.collectAsState() // List<NoteEntity>
+    val notes by vm.notes.collectAsState() // this is a List<NoteEntity> for PreviewParameters
 
     NavHost(
         navController = nav,
@@ -226,8 +227,8 @@ fun GridItem(nav: NavController, note: NoteEntity, onDelete: (NoteEntity) -> Uni
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = (note.title ?: "").take(9) +
-                            if (note.title.length >= 9) "..." else "",
+                    text = (note.title ?: "").take(10) +
+                            if (note.title.length >= 10) "..." else "",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -267,6 +268,7 @@ Individual note screen
 
 
 //region
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun IndividualNote(nav: NavController, vm: NoteVM, id: Int) {
     val notes by vm.notes.collectAsState()
@@ -303,7 +305,7 @@ fun IndividualNote(nav: NavController, vm: NoteVM, id: Int) {
                 modifier = Modifier
                     .background(MaterialTheme.colorScheme.background)
                     .fillMaxSize()
-                    .padding(start = 20.dp, end = 20.dp, top = 40.dp, bottom = 20.dp)
+                    .padding(start = 20.dp, end = 20.dp, top = 50.dp, bottom = 20.dp)
             ) {
                 // Title
                 Card(
@@ -405,6 +407,12 @@ fun IndividualNote(nav: NavController, vm: NoteVM, id: Int) {
                 modifier = Modifier.size(60.dp),
 //                containerColor = FABColor,
                 onClick = {
+                    val toSave = NoteEntity(
+                        id = id,
+                        title = title,
+                        body = body
+                    )
+                    vm.saveNote(toSave)
                     nav.popBackStack()
                 },
                 shape = RoundedCornerShape(18.dp),

@@ -27,4 +27,12 @@ The **`Room`** package is where all of the objects and entities that room needs 
 
 The whole app follows the MaterialUI aesthetic, with rounded corners, pastel colors, a modern font, and a simple, minimalistic UI.
 
-The basic idea for the UI was to have a similar feel to Samsung Notes, so a grid instead of a LazyList felt like the obvious choice. A FloatingActionButton for adding and saving notes was also a must have.
+The basic idea for the menu UI was to have a similar feel to Samsung Notes, an app that i use daily, so a grid instead of a LazyList felt like the obvious choice. A FloatingActionButton for adding and saving notes was also a must have.
+
+As for the creation of notes, because of my technical skills and knowledge about the technologies, i aimed for a simplistic and familiar set of actions (similar to SQL's CRUD). Create note, read note, edit note, delete note. Nothing else. 
+
+---
+
+### Challenges:
+
+The Android developing world is a complex and everchanging one. 3 year old StackOverflow questions don't work anymore because, as phones change every year, technologies have to follow them. The documentation from the official AndroidDeveloper webpage is also unclear in some cases. All of this led to long afternoons of diving into a loophole of asking questions both in online forums and AI chats. This was frustrating but also a great learning experience, full of difficult challenges to overcome and an accomplishment sensation whenever i got over them.
