@@ -46,6 +46,7 @@ dependencies {
 
     // Kotlin coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
+    implementation(libs.androidx.compose.foundation)
 
     // ViewModel
     val lifecycle_version = "2.10.0"

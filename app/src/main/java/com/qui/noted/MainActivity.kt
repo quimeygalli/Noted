@@ -3,8 +3,9 @@ package com.qui.noted
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -72,7 +73,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        WindowCompat.setDecorFitsSystemWindows(window, false)
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false)
+
         val db = NoteDatabase.getDatabase(applicationContext)
         val repo = NoteRepository(db.dao())
         val factory = NoteVMFactory(repo)
@@ -152,7 +154,7 @@ fun NoteMenu(nav: NavController, vm: NoteVM) {
                 GreetingBar()
             }
             Row(modifier = Modifier.weight(75f)) {
-                NoteGrid(nav = nav, notes = notes)
+                NoteGrid(nav = nav, notes = notes, onDelete = { note -> vm.deleteNote(note)})
             }
         }
     }
@@ -171,7 +173,10 @@ fun GreetingBar() {
 }
 
 @Composable
-fun NoteGrid(nav: NavController, notes: List<NoteEntity>) {
+fun NoteGrid(
+    nav: NavController,
+    notes: List<NoteEntity>,
+    onDelete: (NoteEntity) -> Unit) {
     LazyVerticalGrid(
         modifier = Modifier.background(MaterialTheme.colorScheme.background),
         columns = GridCells.Fixed(3),
@@ -180,13 +185,17 @@ fun NoteGrid(nav: NavController, notes: List<NoteEntity>) {
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         items(notes) { note ->
-            GridItem(nav = nav, note = note)
+            GridItem(
+                nav = nav,
+                note = note,
+                onDelete = onDelete)
         }
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun GridItem(nav: NavController, note: NoteEntity) {
+fun GridItem(nav: NavController, note: NoteEntity, onDelete: (NoteEntity) -> Unit) {
     val colors = listOf(Color.Transparent, MaterialTheme.colorScheme.primary)
 
     Card(
@@ -195,11 +204,17 @@ fun GridItem(nav: NavController, note: NoteEntity) {
             .width(160.dp)
             .height(200.dp)
             .clip(RoundedCornerShape(18.dp))
-            .clickable {
-                // gotta check if id exists for safe nav
-                val id = note.id ?: return@clickable
-                nav.navigate("note/$id")
-            }
+            .combinedClickable (
+                onLongClick = {
+                    onDelete(note)
+                },
+                onClick = {
+                    // check if note id is not null. if it is, the elvis operator (?:) makes it so if it is null, it returns @combinedClickable
+                    // returning @combinedClickable goes back to that statement and the composable continues from there.
+                    val id = note.id ?: return@combinedClickable
+                    nav.navigate("note/$id")
+                }
+            )
     ) {
         Box(modifier = Modifier.clip(RoundedCornerShape(18.dp))) {
             Column(
@@ -210,8 +225,8 @@ fun GridItem(nav: NavController, note: NoteEntity) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = (note.title ?: "").take(40) +
-                            if (note.title.length > 40) "..." else "",
+                    text = (note.title ?: "").take(9) +
+                            if (note.title.length >= 9) "..." else "",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -387,12 +402,6 @@ fun IndividualNote(nav: NavController, vm: NoteVM, id: Int) {
                 modifier = Modifier.size(60.dp),
 //                containerColor = FABColor,
                 onClick = {
-                    val toSave = NoteEntity(
-                        id = null,
-                        title = title,
-                        body = body
-                    )
-                    vm.saveNote(toSave)
                     nav.popBackStack()
                 },
                 shape = RoundedCornerShape(18.dp),
