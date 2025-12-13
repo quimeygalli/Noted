@@ -11,7 +11,9 @@ Noted is a lightweight, productivity-focused note-taking Android app written ent
 
 The project files follow modern Android conventions. The **`java/com/qui/noted`** folder contains all of the logic, UI layout, and Room setup. For the vectors icons, image and string resources please refer to **`app/src/main/res`**.
 
-The main entry point for the app is **`MainActivity.kt`**, this file contains the whole UI for the menu and note screens. It also initializes navigation and ViewModels.
+The main entry point for the app is **`MainActivity.kt`**, this file contains the hole UI for the menu and note screens. It also initializes navigation and ViewModels.
+
+
 
 The **`Room`** package is where all of the objects and entities that room needs in order to store the data locally exist. In there you can find:
 
@@ -35,4 +37,7 @@ As for the creation of notes, because of my technical skills and knowledge about
 
 ### Challenges:
 
-The Android developing world is a complex and everchanging one. 3 year old StackOverflow questions don't work anymore because, as phones change every year, technologies have to follow them. The documentation from the official AndroidDeveloper webpage is also unclear in some cases. All of this led to long afternoons of diving into a loophole of asking questions both in online forums and AI chats. This was frustrating but also a great learning experience, full of difficult challenges to overcome and an accomplishment sensation whenever i got over them.
+The Android developing world is a complex and everchanging one. Three year old StackOverflow questions don't work anymore because, as phones change every year, technologies have to follow them.
+
+The documentation from the official AndroidDeveloper webpage is also unclear and/or outdated in some cases. All of this led to long afternoons of diving into a loophole of asking questions both in online forums and AI chats. This was frustrating but also a great learning experience, full of difficult challenges to overcome and an accomplishment sensation whenever i got over them.
+
