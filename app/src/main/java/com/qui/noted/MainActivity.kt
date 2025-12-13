@@ -429,7 +429,7 @@ fun IndividualNote(nav: NavController, vm: NoteVM, id: Int) {
                 modifier = Modifier
                     .background(MaterialTheme.colorScheme.background)
                     .fillMaxSize()
-                    .padding(20.dp)
+                    .padding(start = 20.dp, end = 20.dp, top = 50.dp, bottom = 20.dp)
             ) {
                 Card(
                     shape = RoundedCornerShape(18.dp),
