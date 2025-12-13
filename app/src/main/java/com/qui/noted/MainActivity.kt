@@ -22,13 +22,11 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -62,12 +60,7 @@ import com.qui.noted.Room.NoteDatabase
 import com.qui.noted.Room.NoteEntity
 import com.qui.noted.Room.NoteRepository
 import com.qui.noted.Room.NoteVMFactory
-import com.qui.noted.ui.theme.ui.theme.CardBodyBackgroundColor
-import com.qui.noted.ui.theme.ui.theme.CardTitleBackgroundColor
-import com.qui.noted.ui.theme.ui.theme.FABColor
-import com.qui.noted.ui.theme.ui.theme.LightTextColor
 import com.qui.noted.ui.theme.ui.theme.NotedTheme
-import com.qui.noted.ui.theme.ui.theme.White
 
 /* Font Family */
 
@@ -92,7 +85,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
 
 @Composable
 fun NotedApp(vm: NoteVM) {
@@ -133,9 +125,9 @@ fun NoteMenu(nav: NavController, vm: NoteVM) {
         floatingActionButton = {
             FloatingActionButton(
                 modifier = Modifier.size(60.dp),
-                containerColor = FABColor,
                 onClick = { nav.navigate("note/0") }, // navigate to "new note" screen
-                shape = RoundedCornerShape(18.dp)
+                shape = RoundedCornerShape(18.dp),
+                containerColor = (MaterialTheme.colorScheme.onTertiary)
             ) {
                 Icon(
                     painter = painterResource(R.drawable.ic_add_note),
@@ -146,7 +138,7 @@ fun NoteMenu(nav: NavController, vm: NoteVM) {
     ) { paddingValues ->
         Column(
             modifier = Modifier
-                .background(Color.White)
+                .background(MaterialTheme.colorScheme.background)
                 .padding(paddingValues)
         ) {
             Row(
@@ -173,6 +165,7 @@ fun GreetingBar() {
         fontSize = 32.sp,
         textAlign = TextAlign.Center,
         fontFamily = onestFontFamily,
+        color = MaterialTheme.colorScheme.onSurface,
         lineHeight = 35.sp
     )
 }
@@ -180,8 +173,8 @@ fun GreetingBar() {
 @Composable
 fun NoteGrid(nav: NavController, notes: List<NoteEntity>) {
     LazyVerticalGrid(
-        modifier = Modifier.background(color = Color.White),
-        columns = GridCells.Fixed(2),
+        modifier = Modifier.background(MaterialTheme.colorScheme.background),
+        columns = GridCells.Fixed(3),
         contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -194,7 +187,7 @@ fun NoteGrid(nav: NavController, notes: List<NoteEntity>) {
 
 @Composable
 fun GridItem(nav: NavController, note: NoteEntity) {
-    val colors = listOf(Color.Transparent, Color.LightGray)
+    val colors = listOf(Color.Transparent, MaterialTheme.colorScheme.primary)
 
     Card(
         shape = RoundedCornerShape(18.dp),
@@ -203,7 +196,7 @@ fun GridItem(nav: NavController, note: NoteEntity) {
             .height(200.dp)
             .clip(RoundedCornerShape(18.dp))
             .clickable {
-                // safe navigate only if id exists
+                // gotta check if id exists for safe nav
                 val id = note.id ?: return@clickable
                 nav.navigate("note/$id")
             }
@@ -212,7 +205,7 @@ fun GridItem(nav: NavController, note: NoteEntity) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.LightGray)
+                    .background(MaterialTheme.colorScheme.primary)
                     .padding(10.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -225,7 +218,7 @@ fun GridItem(nav: NavController, note: NoteEntity) {
                 Spacer(Modifier.height(5.dp))
                 Text(
                     text = (note.body ?: "").take(200),
-                    color = LightTextColor
+//                    color = LightTextColor
                 )
             }
 
@@ -237,7 +230,7 @@ fun GridItem(nav: NavController, note: NoteEntity) {
                     .background(
                         Brush.verticalGradient(
                             colors = colors,
-                            startY = 100f,
+                            startY = 220f,
                             endY = 500f
                         )
                     )
@@ -270,7 +263,7 @@ fun IndividualNote(nav: NavController, vm: NoteVM, id: Int) {
             floatingActionButton = {
                 FloatingActionButton(
                     modifier = Modifier.size(60.dp),
-                    containerColor = FABColor,
+//                    containerColor = FABColor,
                     onClick = {
                         val toSave = NoteEntity(
                             id = null,
@@ -280,7 +273,8 @@ fun IndividualNote(nav: NavController, vm: NoteVM, id: Int) {
                         vm.saveNote(toSave)
                         nav.popBackStack()
                     },
-                    shape = RoundedCornerShape(18.dp)
+                    shape = RoundedCornerShape(18.dp),
+                    containerColor = MaterialTheme.colorScheme.onTertiary
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.ic_check),
@@ -291,7 +285,7 @@ fun IndividualNote(nav: NavController, vm: NoteVM, id: Int) {
         ) {
             Column(
                 modifier = Modifier
-                    .background(color = White)
+                    .background(MaterialTheme.colorScheme.background)
                     .fillMaxSize()
                     .padding(20.dp)
             ) {
@@ -299,7 +293,7 @@ fun IndividualNote(nav: NavController, vm: NoteVM, id: Int) {
                 Card(
                     shape = RoundedCornerShape(18.dp),
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = CardTitleBackgroundColor)
+//                    colors = CardDefaults.cardColors(containerColor = CardTitleBackgroundColor)
                 ) {
                     TextField(
                         modifier = Modifier.padding(10.dp),
@@ -333,7 +327,7 @@ fun IndividualNote(nav: NavController, vm: NoteVM, id: Int) {
                 Card(
                     shape = RoundedCornerShape(18.dp),
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = CardBodyBackgroundColor)
+//                    colors = CardDefaults.cardColors(containerColor = CardBodyBackgroundColor)
                 ) {
                     LazyColumn {
                         item {
@@ -391,7 +385,7 @@ fun IndividualNote(nav: NavController, vm: NoteVM, id: Int) {
         floatingActionButton = {
             FloatingActionButton(
                 modifier = Modifier.size(60.dp),
-                containerColor = FABColor,
+//                containerColor = FABColor,
                 onClick = {
                     val toSave = NoteEntity(
                         id = null,
@@ -401,7 +395,8 @@ fun IndividualNote(nav: NavController, vm: NoteVM, id: Int) {
                     vm.saveNote(toSave)
                     nav.popBackStack()
                 },
-                shape = RoundedCornerShape(18.dp)
+                shape = RoundedCornerShape(18.dp),
+                containerColor = MaterialTheme.colorScheme.onTertiary
             ) {
                 Icon(
                     painter = painterResource(R.drawable.ic_check),
@@ -412,14 +407,14 @@ fun IndividualNote(nav: NavController, vm: NoteVM, id: Int) {
     ) {
             Column(
                 modifier = Modifier
-                    .background(color = White)
+                    .background(MaterialTheme.colorScheme.background)
                     .fillMaxSize()
                     .padding(20.dp)
             ) {
                 Card(
                     shape = RoundedCornerShape(18.dp),
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = CardTitleBackgroundColor)
+//                    colors = CardDefaults.cardColors(containerColor = CardTitleBackgroundColor)
                 ) {
                     TextField(
                         modifier = Modifier.padding(10.dp),
@@ -452,7 +447,7 @@ fun IndividualNote(nav: NavController, vm: NoteVM, id: Int) {
                 Card(
                     shape = RoundedCornerShape(18.dp),
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = CardBodyBackgroundColor)
+//                    colors = CardDefaults.cardColors(containerColor = CardBodyBackgroundColor)
                 ) {
                     LazyColumn {
                         item {
