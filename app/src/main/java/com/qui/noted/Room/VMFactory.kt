@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.qui.noted.NoteVM
 
-// Credits to @Ali in stackOverflow for helping with this, i couldnt have done it without you
+// Credits to @Ali in stackOverflow for helping with this.
 
 class NoteVMFactory(private val repository: NoteRepository) : ViewModelProvider.Factory {
 

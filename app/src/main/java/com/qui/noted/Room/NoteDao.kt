@@ -3,7 +3,7 @@ package com.qui.noted.Room
 import androidx.room.*
 
 
-// Please never make me implement room again, dont touch this sht ever again.
+// Dont touch this.
 
 @Dao
 interface NoteDao {

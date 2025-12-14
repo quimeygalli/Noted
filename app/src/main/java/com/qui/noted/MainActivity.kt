@@ -394,7 +394,7 @@ fun IndividualNote(nav: NavController, vm: NoteVM, id: Int) {
         Column(
             Modifier
                 .fillMaxSize()
-                .padding(start = 20.dp, end = 20.dp, top = 40.dp, bottom = 20.dp),
+                .padding(start = 20.dp, end = 20.dp, top = 50.dp, bottom = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {

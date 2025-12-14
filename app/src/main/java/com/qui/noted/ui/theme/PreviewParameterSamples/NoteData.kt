@@ -2,6 +2,8 @@ package com.qui.noted.ui.theme.PreviewParameterSamples
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 
+/** A note preview for PreviewParameter**/
+
 data class  NoteData (
     val id: Int = -1,
     var title: String,

@@ -1,7 +1,6 @@
 package com.qui.noted.ui.theme.ui.theme
 
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 
 val White = Color(0xFFFFFFFF)
 

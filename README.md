@@ -1,6 +1,6 @@
 # Noted
 
-#### Video Demo: `<URL HERE>`
+### [Video Demo](https://youtu.be/pU8_G0qVQbo)
 
 ## Description:
 Noted is a lightweight, productivity-focused note-taking Android app written entirely in Kotlin. It provides fast local note creation, editing, deletion, and simple organization. The UI is implemented with Jetpack Compose and Material 3, while state is handled using Android’s ViewModel architecture. Persistence is fully local via Room (SQLite), allowing for the app to work offline.
