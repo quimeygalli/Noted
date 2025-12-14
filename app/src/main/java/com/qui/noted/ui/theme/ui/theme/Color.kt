@@ -31,8 +31,6 @@ val LightTextColor_Light = Color(0xFF505050)
 
 val Primary_Light = Color(0xFFEAEAEE)
 
-val Accent_Light = Color(0xFFD56F5E) //controls font
-
 val FAB_Light = Color(0xFFFBFAFC)
 
 //endregion

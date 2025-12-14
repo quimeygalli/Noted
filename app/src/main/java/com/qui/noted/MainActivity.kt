@@ -26,6 +26,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
@@ -311,7 +312,9 @@ fun IndividualNote(nav: NavController, vm: NoteVM, id: Int) {
                 Card(
                     shape = RoundedCornerShape(18.dp),
                     modifier = Modifier.fillMaxWidth(),
-//                    colors = CardDefaults.cardColors(containerColor = CardTitleBackgroundColor)
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.primary
+                    )
                 ) {
                     TextField(
                         modifier = Modifier.padding(10.dp),
@@ -345,6 +348,9 @@ fun IndividualNote(nav: NavController, vm: NoteVM, id: Int) {
                 Card(
                     shape = RoundedCornerShape(18.dp),
                     modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.primary
+                    )
 //                    colors = CardDefaults.cardColors(containerColor = CardBodyBackgroundColor)
                 ) {
                     LazyColumn {
@@ -416,7 +422,7 @@ fun IndividualNote(nav: NavController, vm: NoteVM, id: Int) {
                     nav.popBackStack()
                 },
                 shape = RoundedCornerShape(18.dp),
-                containerColor = MaterialTheme.colorScheme.onTertiary
+                containerColor = MaterialTheme.colorScheme.primary
             ) {
                 Icon(
                     painter = painterResource(R.drawable.ic_check),
@@ -434,6 +440,9 @@ fun IndividualNote(nav: NavController, vm: NoteVM, id: Int) {
                 Card(
                     shape = RoundedCornerShape(18.dp),
                     modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.primary
+                    )
 //                    colors = CardDefaults.cardColors(containerColor = CardTitleBackgroundColor)
                 ) {
                     TextField(
@@ -467,6 +476,9 @@ fun IndividualNote(nav: NavController, vm: NoteVM, id: Int) {
                 Card(
                     shape = RoundedCornerShape(18.dp),
                     modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.primary
+                    )
 //                    colors = CardDefaults.cardColors(containerColor = CardBodyBackgroundColor)
                 ) {
                     LazyColumn {
